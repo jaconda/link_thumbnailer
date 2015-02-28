@@ -7,7 +7,8 @@ module LinkThumbnailer
 
         def value
           ::LinkThumbnailer::Scrapers::Opengraph::Image::Base.new(document, website).value +
-          ::LinkThumbnailer::Scrapers::Opengraph::Image::Url.new(document, website).value
+          ::LinkThumbnailer::Scrapers::Opengraph::Image::Url.new(document, website).value +
+          ::LinkThumbnailer::Scrapers::Opengraph::Image::Twitter.new(document, website).value
         end
 
         private
@@ -61,6 +62,17 @@ module LinkThumbnailer
 
           def attribute
             'og:image:url'
+          end
+
+        end
+
+        # Handles `twitter:image` attributes.
+        class Twitter < ::LinkThumbnailer::Scrapers::Opengraph::Image::Base
+
+          private
+
+          def attribute
+            'twitter:image'
           end
 
         end
