@@ -77,11 +77,16 @@ module LinkThumbnailer
       end
 
       encoding = get_encoding_from_headers(response['content-type'])
-      if encoding
-        decoded_body.force_encoding(encoding).encode('UTF-8')
-      else
-        decoded_body
+      if !encoding
+        # trying to find encoding in meta tags
+        document = ::Nokogiri::HTML(decoded_body)
+        if document.meta_encoding
+          encoding = document.meta_encoding
+        else
+          encoding = 'ISO-8859-1'
+        end
       end
+      decoded_body.force_encoding(encoding).encode('UTF-8')
     end
 
     # Return encoding from an HTTP header hash.
@@ -97,11 +102,6 @@ module LinkThumbnailer
 
       if params.include?('charset')
         return params.fetch('charset').gsub(/(\A["']*)|(["']*\z)/, '')
-      end
-
-      # HTTP typically defaults to ISO-8859-1 when not specified.
-      if content_type.include?('text')
-        return 'ISO-8859-1'
       end
 
       nil
