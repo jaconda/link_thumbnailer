@@ -48,6 +48,7 @@ module LinkThumbnailer
 
     def perform_request
       response = http.request(url)
+      return if response.content_type != "text/html"
       case response
       when ::Net::HTTPSuccess then decode(response)
       when ::Net::HTTPRedirection
