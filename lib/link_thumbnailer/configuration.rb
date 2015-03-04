@@ -36,10 +36,10 @@ module LinkThumbnailer
       @verify_ssl             = true
       @http_timeout           = 5
       @blacklist_urls         = [
-        %r{^http://ad\.doubleclick\.net/},
-        %r{^http://b\.scorecardresearch\.com/},
-        %r{^http://pixel\.quantserve\.com/},
-        %r{^http://s7\.addthis\.com/}
+        %r{^https?://ad\.doubleclick\.net/},
+        %r{^https?://b\.scorecardresearch\.com/},
+        %r{^https?://pixel\.quantserve\.com/},
+        %r{^https?://s7\.addthis\.com/}
       ]
       @attributes             = [:title, :images, :description, :videos, :favicon]
       @graders                = [

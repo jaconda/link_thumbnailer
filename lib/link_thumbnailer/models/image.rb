@@ -11,6 +11,7 @@ module LinkThumbnailer
 
       def initialize(src, size = nil, type = nil)
         @src  = src
+        return if !valid?
         @size = size || parser.size(self)
         @type = type || parser.type(self)
       end
