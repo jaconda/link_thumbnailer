@@ -52,8 +52,10 @@ module LinkThumbnailer
       case response
       when ::Net::HTTPSuccess then decode(response)
       when ::Net::HTTPRedirection
-        cookie = {'Cookie' => response.to_hash['set-cookie'].collect { |ea| ea[/^.*?;/]}.join }
-        http.headers['Cookie'] = cookie
+        if response['set-cookie']
+          cookie = {'Cookie' => response.to_hash['set-cookie'].collect { |ea| ea[/^.*?;/]}.join }
+          http.headers['Cookie'] = cookie
+        end
         call resolve_relative_url(response['location']), redirect_count + 1
       else
         response.error!
