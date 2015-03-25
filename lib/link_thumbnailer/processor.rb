@@ -48,9 +48,11 @@ module LinkThumbnailer
 
     def perform_request
       response = http.request(url)
-      return if response.content_type != "text/html"
       case response
-      when ::Net::HTTPSuccess then decode(response)
+      when ::Net::HTTPSuccess
+        if response.content_type == "text/html"
+          decode(response)
+        end
       when ::Net::HTTPRedirection
         if response['set-cookie']
           cookie = {'Cookie' => response.to_hash['set-cookie'].collect { |ea| ea[/^.*?;/]}.join }
