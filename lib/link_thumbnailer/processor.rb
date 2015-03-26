@@ -180,7 +180,7 @@ module LinkThumbnailer
     end
 
     def build_absolute_url_for(relative_url)
-      URI("#{url.scheme}://#{url.host}#{relative_url}")
+      relative_url.start_with?('//') ? URI("#{url.scheme}:#{relative_url}") : URI("#{url.scheme}://#{url.host}#{relative_url}")
     end
 
     def redirect_limit
