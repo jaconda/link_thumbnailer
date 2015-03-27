@@ -45,10 +45,7 @@ module LinkThumbnailer
     private
 
     def scrapers
-      [
-        '::LinkThumbnailer::Scrapers::Opengraph',
-        '::LinkThumbnailer::Scrapers::Default'
-      ]
+      config.scrapers
     end
 
     def scraper_class(prefix, name)
