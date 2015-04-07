@@ -7,7 +7,8 @@ module LinkThumbnailer
       class Images < ::LinkThumbnailer::Scrapers::Default::Base
 
         def value
-          abs_urls.each_with_index.take_while { |_, i| i < config.image_limit }.map { |e| modelize(e.first) }
+          # abs_urls.each_with_index.take_while { |_, i| i < config.image_limit }.map { |e| modelize(e.first) }
+          []
         end
 
         private
