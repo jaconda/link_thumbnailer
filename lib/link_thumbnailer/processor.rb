@@ -1,22 +1,22 @@
 require 'delegate'
 require 'uri'
-require 'net/http/persistent'
 
 module LinkThumbnailer
   class Processor < ::SimpleDelegator
 
     attr_accessor :url
-    attr_reader   :config, :http, :redirect_count
+    attr_reader   :config, :request, :http, :redirect_count
 
     def initialize
       @config = ::LinkThumbnailer.page.config
-      @http   = ::Net::HTTP::Persistent.new
 
       super(config)
     end
 
     def call(url = '', redirect_count = 0)
       self.url        = url
+      @http = ::Net::HTTP.new(url.hostname, url.port)
+      @request = ::Net::HTTP::Get.new(url)
       @redirect_count = redirect_count
 
       raise ::LinkThumbnailer::RedirectLimit if too_many_redirections?
@@ -36,18 +36,21 @@ module LinkThumbnailer
     end
 
     def set_http_headers
-      http.headers['User-Agent']               = user_agent
-      http.override_headers['Accept-Encoding'] = 'gzip, deflate'
+      request['User-Agent'] = user_agent
+      request['Accept-Encoding'] = 'gzip, deflate'
+      request['Accept'] = '*/*'
     end
 
     def set_http_options
       http.verify_mode  = ::OpenSSL::SSL::VERIFY_NONE unless ssl_required?
       http.open_timeout = http_timeout
-      http.proxy = :ENV
     end
 
     def perform_request
-      response = http.request(url)
+      response = http.start do |http|
+        http.request(request)
+      end
+
       case response
       when ::Net::HTTPSuccess
         if response.content_type == "text/html"
@@ -56,7 +59,7 @@ module LinkThumbnailer
       when ::Net::HTTPRedirection
         if response['set-cookie']
           cookie = {'Cookie' => response.to_hash['set-cookie'].collect { |ea| ea[/^.*?;/]}.join }
-          http.headers['Cookie'] = cookie
+          request['Cookie'] = cookie
         end
         call resolve_relative_url(response['location']), redirect_count + 1
       else
