@@ -13,10 +13,10 @@ module LinkThumbnailer
       super(config)
     end
 
-    def call(url = '', redirect_count = 0)
-      self.url        = url
-      @http = ::Net::HTTP.new(@url.hostname, @url.port)
-      @request = ::Net::HTTP::Get.new(@url.path)
+    def call(uri = '', redirect_count = 0)
+      self.url        = uri
+      @http = ::Net::HTTP.new(url.hostname, url.port)
+      @request = ::Net::HTTP::Get.new(url.path)
       @redirect_count = redirect_count
 
       raise ::LinkThumbnailer::RedirectLimit if too_many_redirections?
@@ -44,6 +44,7 @@ module LinkThumbnailer
     def set_http_options
       http.verify_mode  = ::OpenSSL::SSL::VERIFY_NONE unless ssl_required?
       http.open_timeout = http_timeout
+      http.use_ssl = (url.scheme == "https")
     end
 
     def perform_request
