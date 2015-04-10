@@ -15,8 +15,8 @@ module LinkThumbnailer
 
     def call(url = '', redirect_count = 0)
       self.url        = url
-      @http = ::Net::HTTP.new(url.hostname, url.port)
-      @request = ::Net::HTTP::Get.new(url)
+      @http = ::Net::HTTP.new(@url.hostname, @url.port)
+      @request = ::Net::HTTP::Get.new(@url.path)
       @redirect_count = redirect_count
 
       raise ::LinkThumbnailer::RedirectLimit if too_many_redirections?
