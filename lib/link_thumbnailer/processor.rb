@@ -5,7 +5,7 @@ module LinkThumbnailer
   class Processor < ::SimpleDelegator
 
     attr_accessor :url
-    attr_reader   :config, :request, :http, :redirect_count
+    attr_reader   :config, :request, :response, :http, :redirect_count
 
     def initialize
       @config = ::LinkThumbnailer.page.config
@@ -39,6 +39,10 @@ module LinkThumbnailer
       request['User-Agent'] = user_agent
       request['Accept-Encoding'] = 'gzip, deflate'
       request['Accept'] = '*/*'
+      if response && response['set-cookie']
+        cookie = response.to_hash['set-cookie'].collect { |ea| ea[/^.*?;/]}.join
+        request['Cookie'] = cookie
+      end
     end
 
     def set_http_options
@@ -48,7 +52,7 @@ module LinkThumbnailer
     end
 
     def perform_request
-      response = http.start do |http|
+      @response = http.start do |http|
         http.request(request)
       end
 
@@ -56,12 +60,10 @@ module LinkThumbnailer
       when ::Net::HTTPSuccess
         if response.content_type == "text/html"
           decode(response)
+        else
+          response.error!
         end
       when ::Net::HTTPRedirection
-        if response['set-cookie']
-          cookie = {'Cookie' => response.to_hash['set-cookie'].collect { |ea| ea[/^.*?;/]}.join }
-          request['Cookie'] = cookie
-        end
         call resolve_relative_url(response['location']), redirect_count + 1
       else
         response.error!
