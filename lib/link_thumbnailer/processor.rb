@@ -100,7 +100,12 @@ module LinkThumbnailer
           encoding = 'ISO-8859-1'
         end
       end
-      decoded_body.force_encoding(fix_encoding(encoding)).encode('UTF-8')
+
+      begin
+        decoded_body.force_encoding(fix_encoding(encoding)).encode('UTF-8')
+      rescue ArgumentError
+        decoded_body
+      end
     end
 
     # pages somtimes includes invalid encodings like iso885915 or utf8 so we transform them to iso-885915 or utf-8
@@ -108,6 +113,8 @@ module LinkThumbnailer
       case encoding
         # ISO-8859-15, ISO-2022-JP and alike
         when /iso-?(\d{4})-?(\w{1,2})/i then return "ISO-#{$1}-#{$2}"
+        # ISO_8859-15, ISO_2022-JP and alike
+        when /iso_?(\d{4})-?(\w{1,2})/i then return "ISO-#{$1}-#{$2}"
         # "ISO-2022-JP-KDDI"  and alike
         when /iso-?(\d{4})-?(\w{1,2})-?(\w*)/i then return "ISO-#{$1}-#{$2}-#{$3}"
         # utf-8 and alike
