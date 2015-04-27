@@ -1,5 +1,6 @@
 require 'delegate'
 require 'uri'
+require 'addressable/uri'
 
 module LinkThumbnailer
   class Processor < ::SimpleDelegator
@@ -242,7 +243,7 @@ module LinkThumbnailer
     end
 
     def url=(url)
-      @url = ::URI.parse(url.to_s)
+      @url = ::URI.parse(Addressable::URI.parse(url.to_s).normalize.to_s)
     end
 
   end

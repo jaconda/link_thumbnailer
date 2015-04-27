@@ -23,4 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'nokogiri',               '~> 1.6'
   spec.add_dependency 'fastimage',              '~> 1.6'
   spec.add_dependency 'video_info',             '~> 2.4'
+  spec.add_dependency 'addressable',            '~> 2.3'
 end
