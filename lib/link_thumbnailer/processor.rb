@@ -77,7 +77,11 @@ module LinkThumbnailer
       decoded_body = if (!body) || body.empty?
         body
       elsif content_encoding == 'gzip'
-        Zlib::GzipReader.new(StringIO.new(body)).read
+        begin
+          Zlib::GzipReader.new(StringIO.new(body)).read
+        rescue Zlib::GzipFile::Error
+          body
+        end
       elsif content_encoding == 'deflate'
         begin
           Zlib::Inflate.new.inflate body
